@@ -37,29 +37,8 @@ const Footer = () => {
       <div className="relative">
         {/* Top Section */}
         <div className="container mx-auto px-4 pt-16 pb-8">
-          {/* Newsletter Section */}
-          <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 mb-12 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-y-16 translate-x-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full translate-y-12 -translate-x-12"></div>
-            <div className="relative z-10">
-              <div className="text-center max-w-2xl mx-auto">
-                <h3 className="text-2xl font-bold mb-2">🎉 Đăng ký nhận tin khuyến mãi</h3>
-                <p className="text-primary-100 mb-6">
-                  Nhận thông tin về sản phẩm mới và ưu đãi đặc biệt dành riêng cho thú cưng
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                  <input
-                    type="email"
-                    placeholder="Nhập email của bạn..."
-                    className="flex-1 px-4 py-3 rounded-xl text-gray-800 border-0 focus:outline-none focus:ring-4 focus:ring-white/30"
-                  />
-                  <button className="bg-white text-primary-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors duration-200 shadow-lg">
-                    Đăng ký
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+        
+     
 
           {/* Main Footer Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">

@@ -1,6 +1,6 @@
-// src/pages/customer/Home.jsx
+// src/pages/customer/Home.jsx - Complete fixed version
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, ChevronLeft, ChevronRight, Star, Heart, ShoppingCart, Package, ArrowRight, TrendingUp, Award, Shield, Truck } from 'lucide-react';
+import { Search, Filter, ChevronLeft, ChevronRight, ArrowRight, TrendingUp, Award, Shield, Truck } from 'lucide-react';
 import ProductList from '../../components/product/ProductList';
 import productService from '../../services/productService';
 
@@ -60,7 +60,7 @@ const Home = () => {
     {
       icon: Award,
       title: "Uy tín hàng đầu",
-      description: "Được hàng nghìn khách hàng tin tương"
+      description: "Được hàng nghìn khách hàng tin tưởng"
     },
     {
       icon: TrendingUp,
@@ -169,10 +169,16 @@ const Home = () => {
     return labels[type] || type;
   };
 
+  const clearFilters = () => {
+    setSelectedCategory('');
+    setSelectedPetType('');
+    fetchProducts();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Banner Section */}
-      <section className="relative h-[600px] overflow-hidden rounded-2xl mx-4 mt-4 shadow-2xl">
+      <section className="relative h-[400px] md:h-[500px] overflow-hidden rounded-2xl mx-4 mt-4 shadow-2xl">
         {bannerSlides.map((slide, index) => (
           <div
             key={slide.id}
@@ -195,26 +201,22 @@ const Home = () => {
             <div className="relative h-full flex items-center">
               <div className="container mx-auto px-8">
                 <div className="max-w-2xl text-white">
-                  <div className="mb-6 animate-fadeInUp">
-                    <h1 className="text-5xl md:text-6xl font-bold mb-4 leading-tight">
+                  <div className="mb-6">
+                    <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">
                       {slide.title}
                     </h1>
-                    <h2 className="text-2xl md:text-3xl font-light mb-6 text-blue-100">
+                    <h2 className="text-xl md:text-2xl font-light mb-6 text-blue-100">
                       {slide.subtitle}
                     </h2>
-                    <p className="text-lg md:text-xl leading-relaxed mb-8 text-gray-100">
+                    <p className="text-base md:text-lg leading-relaxed mb-8 text-gray-100">
                       {slide.description}
                     </p>
                   </div>
                   
-                  <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp delay-200">
-                    <button className="bg-white text-gray-900 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center gap-2">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button className="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center gap-2">
                       {slide.buttonText}
                       <ArrowRight className="h-5 w-5" />
-                    </button>
-                    <button className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-gray-900 transition-all duration-300 flex items-center justify-center gap-2">
-                      <Package className="h-5 w-5" />
-                      Xem sản phẩm
                     </button>
                   </div>
                 </div>
@@ -253,104 +255,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Search and Filter Section */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="bg-white rounded-2xl shadow-lg p-8 -mt-16 relative z-10 border border-gray-100">
-          {/* Search Bar */}
-          <div className="mb-8">
-            <div className="max-w-2xl mx-auto">
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400 group-focus-within:text-primary-600 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm sản phẩm cho thú cưng của bạn..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-full pl-12 pr-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all duration-300"
-                />
-                <button
-                  onClick={handleSearch}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-all duration-300 font-medium"
-                >
-                  Tìm kiếm
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Filter Section */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <Filter className="h-6 w-6 text-gray-600" />
-              <h3 className="text-xl font-semibold text-gray-800">Lọc sản phẩm</h3>
-            </div>
-            
-            {/* Category Filter */}
-            <div className="text-center">
-              <h4 className="text-sm font-medium text-gray-700 mb-4 uppercase tracking-wide">Danh mục sản phẩm</h4>
-              <div className="flex flex-wrap justify-center gap-3">
-                <button
-                  onClick={() => handleCategoryFilter('')}
-                  className={`px-6 py-3 rounded-full transition-all duration-300 font-medium ${
-                    !selectedCategory
-                      ? 'bg-primary-600 text-white shadow-lg transform scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
-                  }`}
-                >
-                  🏷️ Tất cả
-                </button>
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => handleCategoryFilter(category)}
-                    className={`px-6 py-3 rounded-full transition-all duration-300 font-medium ${
-                      selectedCategory === category
-                        ? 'bg-primary-600 text-white shadow-lg transform scale-105'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Pet Type Filter */}
-            <div className="text-center">
-              <h4 className="text-sm font-medium text-gray-700 mb-4 uppercase tracking-wide">Loại thú cưng</h4>
-              <div className="flex flex-wrap justify-center gap-3">
-                <button
-                  onClick={() => handlePetTypeFilter('')}
-                  className={`px-6 py-3 rounded-full transition-all duration-300 font-medium ${
-                    !selectedPetType
-                      ? 'bg-primary-600 text-white shadow-lg transform scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
-                  }`}
-                >
-                  🐾 Tất cả
-                </button>
-                {petTypes.map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => handlePetTypeFilter(type)}
-                    className={`px-6 py-3 rounded-full transition-all duration-300 font-medium ${
-                      selectedPetType === type
-                        ? 'bg-primary-600 text-white shadow-lg transform scale-105'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:scale-105'
-                    }`}
-                  >
-                    {getPetTypeLabel(type)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-16">
+      <section className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
@@ -368,38 +274,157 @@ const Home = () => {
           })}
         </div>
       </section>
+      {/* Search Section */}
+      <section className="container mx-auto px-4 py-8">
+        <div className="bg-white rounded-2xl shadow-lg p-6 -mt-16 relative z-10 border border-gray-100">
+          <div className="max-w-2xl mx-auto">
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400 group-focus-within:text-primary-600 transition-colors" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm cho thú cưng của bạn..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                className="w-full pl-12 pr-4 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all duration-300"
+              />
+              <button
+                onClick={handleSearch}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-all duration-300 font-medium"
+              >
+                Tìm kiếm
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      {/* Products Section */}
+
+      {/* Main Content with Sidebar */}
       <section className="container mx-auto px-4 pb-16">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-4xl font-bold text-gray-800 mb-4">Sản phẩm nổi bật</h2>
           <div className="w-24 h-1 bg-primary-600 mx-auto"></div>
         </div>
-        
-        <ProductList products={products} loading={loading} />
-      </section>
 
-      {/* CSS for animations */}
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeInUp {
-          animation: fadeInUp 0.8s ease-out forwards;
-        }
-        
-        .delay-200 {
-          animation-delay: 0.2s;
-        }
-      `}</style>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar Filters */}
+          <div className="lg:w-80 flex-shrink-0">
+            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                  <Filter className="h-6 w-6 text-primary-600" />
+                  Bộ lọc
+                </h3>
+                {(selectedCategory || selectedPetType) && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-sm text-red-600 hover:text-red-700 font-medium"
+                  >
+                    Xóa bộ lọc
+                  </button>
+                )}
+              </div>
+
+              {/* Category Filter */}
+              <div className="mb-8">
+                <h4 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
+                  Danh mục sản phẩm
+                </h4>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => handleCategoryFilter('')}
+                    className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
+                      !selectedCategory
+                        ? 'bg-primary-600 text-white shadow-md'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    🏷️ Tất cả danh mục
+                  </button>
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => handleCategoryFilter(category)}
+                      className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
+                        selectedCategory === category
+                          ? 'bg-primary-600 text-white shadow-md'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pet Type Filter */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
+                  Loại thú cưng
+                </h4>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => handlePetTypeFilter('')}
+                    className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
+                      !selectedPetType
+                        ? 'bg-primary-600 text-white shadow-md'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    🐾 Tất cả loại
+                  </button>
+                  {petTypes.map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => handlePetTypeFilter(type)}
+                      className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
+                        selectedPetType === type
+                          ? 'bg-primary-600 text-white shadow-md'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      {getPetTypeLabel(type)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Products Grid */}
+          <div className="flex-1">
+            {/* Active Filters Display */}
+            {(selectedCategory || selectedPetType) && (
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="font-medium text-blue-800">Bộ lọc đang áp dụng:</span>
+                    {selectedCategory && (
+                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
+                        {selectedCategory}
+                      </span>
+                    )}
+                    {selectedPetType && (
+                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
+                        {getPetTypeLabel(selectedPetType)}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={clearFilters}
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  >
+                    Xóa tất cả
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <ProductList products={products} loading={loading} />
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

@@ -1,7 +1,7 @@
-// src/components/product/ProductCard.jsx
+// src/components/product/ProductCard.jsx - Fixed version without wishlist
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Package, Heart, Eye, Star, Zap } from 'lucide-react';
+import { ShoppingCart, Package, Eye, Star, Zap } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -9,7 +9,6 @@ const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -34,12 +33,6 @@ const ProductCard = ({ product }) => {
       toast.classList.add('translate-x-full');
       setTimeout(() => document.body.removeChild(toast), 300);
     }, 2000);
-  };
-
-  const handleLike = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsLiked(!isLiked);
   };
 
   const formatPrice = (price) => {
@@ -113,18 +106,6 @@ const ProductCard = ({ product }) => {
           <div className={`absolute inset-0 bg-black bg-opacity-0 transition-all duration-300 ${
             isHovered ? 'bg-opacity-20' : ''
           }`}>
-            {/* Like Button */}
-            <button
-              onClick={handleLike}
-              className={`absolute top-4 right-4 p-2 rounded-full backdrop-blur-sm transition-all duration-300 ${
-                isLiked 
-                  ? 'bg-red-500 text-white' 
-                  : 'bg-white/80 text-gray-600 hover:bg-red-500 hover:text-white'
-              } ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
-            >
-              <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
-            </button>
-
             {/* Quick View Button */}
             <div className={`absolute bottom-4 left-4 right-4 transform transition-all duration-300 ${
               isHovered ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
@@ -145,7 +126,7 @@ const ProductCard = ({ product }) => {
 
           {/* Pet Type Badge */}
           {product.petType && (
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2">
+            <div className="absolute top-4 right-4">
               <span className="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-xs font-medium">
                 {getPetTypeEmoji(product.petType)} {getPetTypeLabel(product.petType)}
               </span>

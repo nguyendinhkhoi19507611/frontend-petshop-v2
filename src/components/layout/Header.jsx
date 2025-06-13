@@ -1,7 +1,7 @@
-// src/components/layout/Header.jsx
+// src/components/layout/Header.jsx - Fixed version
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, LogOut, Package, LayoutDashboard, UserCircle, MessageCircle, Search, Heart, Gift } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogOut, Package, LayoutDashboard, UserCircle, MessageCircle, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import NotificationBell from '../notifications/NotificationBell';
@@ -92,30 +92,10 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
             </Link>
           </div>
 
-          {/* Center - Search (only show for customer layout) */}
-          {!showMenuButton && (
-            <div className="hidden md:flex flex-1 max-w-lg mx-8">
-              <form onSubmit={handleSearch} className="w-full relative group">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm sản phẩm..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all duration-300"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-600 text-white px-3 py-1 rounded-lg hover:bg-primary-700 transition-colors duration-200 text-sm font-medium"
-                >
-                  Tìm
-                </button>
-              </form>
-            </div>
-          )}
+      
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden lg:flex items-center space-x-6">
             {!showMenuButton && ( // Only show for customer layout
               <>
                 <Link 
@@ -186,16 +166,6 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
             {/* Notifications - show for all authenticated users */}
             {user && <NotificationBell />}
 
-            {/* Wishlist button - only show for customers */}
-            {!showMenuButton && user && (
-              <button className="relative p-2 text-gray-600 hover:text-red-500 transition-colors duration-200 rounded-lg hover:bg-red-50">
-                <Heart className="h-6 w-6" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  0
-                </span>
-              </button>
-            )}
-
             {/* Cart button - only show for customers */}
             {!showMenuButton && (
               <Link to="/cart" className="relative group" onClick={closeMenus}>
@@ -227,7 +197,7 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
 
                 {/* Dropdown menu */}
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-10 border border-gray-100">
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-20 border border-gray-100">
                     {/* User Info */}
                     <div className="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-primary-100">
                       <div className="flex items-center gap-3">
