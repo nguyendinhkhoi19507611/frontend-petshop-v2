@@ -1,4 +1,4 @@
-// src/components/layout/Header.jsx - Fixed version
+// src/components/layout/Header.jsx - Fixed version with Messages link
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, User, Menu, X, LogOut, Package, LayoutDashboard, UserCircle, MessageCircle, Search } from 'lucide-react';
@@ -92,8 +92,6 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
             </Link>
           </div>
 
-      
-
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6">
             {!showMenuButton && ( // Only show for customer layout
@@ -107,13 +105,23 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
                 </Link>
                 
                 {user && (
-                  <Link 
-                    to="/orders" 
-                    className="text-gray-600 hover:text-primary-600 transition-all duration-200 font-medium relative group"
-                  >
-                    Đơn hàng
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-                  </Link>
+                  <>
+                    <Link 
+                      to="/orders" 
+                      className="text-gray-600 hover:text-primary-600 transition-all duration-200 font-medium relative group"
+                    >
+                      Đơn hàng
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    <Link 
+                      to="/messages" 
+                      className="text-gray-600 hover:text-primary-600 transition-all duration-200 font-medium relative group flex items-center gap-1"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Tin nhắn
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                  </>
                 )}
               </>
             )}
@@ -151,11 +159,11 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
                   Đơn hàng
                 </Link>
                 <Link 
-                  to="/employee/chat" 
+                  to="/messages" 
                   className="text-gray-600 hover:text-primary-600 transition-all duration-200 flex items-center gap-2 font-medium"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  Chat
+                  Tin nhắn
                 </Link>
               </>
             )}
@@ -233,6 +241,14 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
                           <ShoppingCart className="h-4 w-4 mr-3 text-gray-500" />
                           Đơn hàng của tôi
                         </Link>
+                        <Link
+                          to="/messages"
+                          onClick={closeMenus}
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <MessageCircle className="h-4 w-4 mr-3 text-gray-500" />
+                          Tin nhắn
+                        </Link>
                         <div className="border-t border-gray-100 my-1"></div>
                       </>
                     )}
@@ -248,12 +264,12 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
                           Xem cửa hàng
                         </Link>
                         <Link
-                          to="/admin/chat"
+                          to="/messages"
                           onClick={closeMenus}
                           className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                         >
                           <MessageCircle className="h-4 w-4 mr-3 text-gray-500" />
-                          Quản lý Chat
+                          Tin nhắn
                         </Link>
                         <div className="border-t border-gray-100 my-1"></div>
                       </>
@@ -334,13 +350,22 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
                   🏠 Trang chủ
                 </Link>
                 {user && (
-                  <Link
-                    to="/orders"
-                    className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
-                    onClick={closeMenus}
-                  >
-                    📦 Đơn hàng của tôi
-                  </Link>
+                  <>
+                    <Link
+                      to="/orders"
+                      className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
+                      onClick={closeMenus}
+                    >
+                      📦 Đơn hàng của tôi
+                    </Link>
+                    <Link
+                      to="/messages"
+                      className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
+                      onClick={closeMenus}
+                    >
+                      💬 Tin nhắn
+                    </Link>
+                  </>
                 )}
               </>
             )}
@@ -381,11 +406,11 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
                   📋 Đơn hàng
                 </Link>
                 <Link
-                  to="/employee/chat"
+                  to="/messages"
                   className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
                   onClick={closeMenus}
                 >
-                  💬 Chat hỗ trợ
+                  💬 Tin nhắn
                 </Link>
               </>
             )}

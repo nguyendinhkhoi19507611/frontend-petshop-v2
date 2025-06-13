@@ -32,9 +32,11 @@ import AdminChatDashboard from './components/admin/AdminChatDashboard';
 // Employee pages
 import OrderManagement from './pages/employee/OrderManagement';
 
+// Messages page
+import MessagesPage from './pages/MessagesPage';
+
 // Chat components
 import ChatButton from './components/chat/ChatButton';
-import NotificationBell from './components/notifications/NotificationBell';
 
 // Protected Route component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -52,7 +54,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
-// Admin/Employee Layout with Sidebar
+// Admin/Employee Layout with Sidebar (Standalone - không cần header bên ngoài)
 const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -77,11 +79,11 @@ const AdminLayout = ({ children }) => {
   );
 };
 
-// Customer Layout
+// Customer Layout với Header riêng
 const CustomerLayout = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* <Header /> */}
+      <Header showMenuButton={false} />
       <main className="flex-grow container mx-auto px-4 py-8">
         {children}
       </main>
@@ -93,122 +95,173 @@ const CustomerLayout = ({ children }) => {
   );
 };
 
-function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+// Public Layout (cho trang không cần đăng nhập)
+const PublicLayout = ({ children }) => {
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header showMenuButton={false} />
+      <main className="flex-grow">
+        {children}
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
+// Messages Layout (Full screen với Header riêng)
+const MessagesLayout = ({ children }) => {
+  return (
+    <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
+      <Header showMenuButton={false} />
+      <div className="flex-1 overflow-hidden">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// Standalone Layout (không có header - cho payment return)
+const StandaloneLayout = ({ children }) => {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {children}
+    </div>
+  );
+};
+
+function App() {
   return (
     <AuthProvider>
       <WebSocketProvider>
         <CartProvider>
           <Router>
-            <div className="min-h-screen bg-gray-50">
-              <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-              <div className="flex">
-                {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
-                <div className="flex-1">
-                  <Routes>
-                    {/* Public routes */}
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/verify-email" element={<EmailVerification />} />
-                    
-                    {/* Customer routes with CustomerLayout */}
-                    <Route path="/product/:id" element={
-                      <CustomerLayout>
-                        <ProductDetail />
-                      </CustomerLayout>
-                    } />
-                    <Route path="/cart" element={
-                      <ProtectedRoute>
-                        <CustomerLayout>
-                          <Cart />
-                        </CustomerLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/orders" element={
-                      <ProtectedRoute>
-                        <CustomerLayout>
-                          <Orders />
-                        </CustomerLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/profile" element={
-                      <ProtectedRoute>
-                        <CustomerLayout>
-                          <Profile />
-                        </CustomerLayout>
-                      </ProtectedRoute>
-                    } />
-                    
-                    {/* Payment routes */}
-                    <Route path="/payment/:orderId" element={
-                      <ProtectedRoute>
-                        <CustomerLayout>
-                          <Payment />
-                        </CustomerLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/payment/return" element={
-                      <PaymentReturn />
-                    } />
-                    
-                    {/* Admin routes with AdminLayout */}
-                    <Route path="/admin/dashboard" element={
-                      <ProtectedRoute allowedRoles={['ADMIN']}>
-                        <AdminLayout>
-                          <AdminDashboard />
-                        </AdminLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/admin/products" element={
-                      <ProtectedRoute allowedRoles={['ADMIN']}>
-                        <AdminLayout>
-                          <ProductManagement />
-                        </AdminLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/admin/users" element={
-                      <ProtectedRoute allowedRoles={['ADMIN']}>
-                        <AdminLayout>
-                          <UserManagement />
-                        </AdminLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/admin/chat" element={
-                      <ProtectedRoute allowedRoles={['ADMIN', 'EMPLOYEE']}>
-                        <AdminLayout>
-                          <AdminChatDashboard />
-                        </AdminLayout>
-                      </ProtectedRoute>
-                    } />
-                    
-                    {/* Employee routes with AdminLayout */}
-                    <Route path="/employee/orders" element={
-                      <ProtectedRoute allowedRoles={['ADMIN', 'EMPLOYEE']}>
-                        <AdminLayout>
-                          <OrderManagement />
-                        </AdminLayout>
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/employee/chat" element={
-                      <ProtectedRoute allowedRoles={['ADMIN', 'EMPLOYEE']}>
-                        <AdminLayout>
-                          <AdminChatDashboard />
-                        </AdminLayout>
-                      </ProtectedRoute>
-                    } />
-                    
-                    {/* Redirect based on role after login */}
-                    <Route path="/dashboard" element={
-                      <ProtectedRoute>
-                        <RedirectBasedOnRole />
-                      </ProtectedRoute>
-                    } />
-                  </Routes>
-                </div>
-              </div>
-            </div>
+            <Routes>
+              {/* Public routes với PublicLayout */}
+              <Route path="/" element={
+                <PublicLayout>
+                  <Home />
+                </PublicLayout>
+              } />
+              <Route path="/login" element={
+                <PublicLayout>
+                  <Login />
+                </PublicLayout>
+              } />
+              <Route path="/register" element={
+                <PublicLayout>
+                  <Register />
+                </PublicLayout>
+              } />
+              <Route path="/verify-email" element={
+                <PublicLayout>
+                  <EmailVerification />
+                </PublicLayout>
+              } />
+              
+              {/* Customer routes với CustomerLayout */}
+              <Route path="/product/:id" element={
+                <CustomerLayout>
+                  <ProductDetail />
+                </CustomerLayout>
+              } />
+              <Route path="/cart" element={
+                <ProtectedRoute>
+                  <CustomerLayout>
+                    <Cart />
+                  </CustomerLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/orders" element={
+                <ProtectedRoute>
+                  <CustomerLayout>
+                    <Orders />
+                  </CustomerLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <CustomerLayout>
+                    <Profile />
+                  </CustomerLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Messages page với MessagesLayout */}
+              <Route path="/messages" element={
+                <ProtectedRoute>
+                  <MessagesLayout>
+                    <MessagesPage />
+                  </MessagesLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Payment routes */}
+              <Route path="/payment/:orderId" element={
+                <ProtectedRoute>
+                  <CustomerLayout>
+                    <Payment />
+                  </CustomerLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/payment/return" element={
+                <StandaloneLayout>
+                  <PaymentReturn />
+                </StandaloneLayout>
+              } />
+              
+              {/* Admin routes với AdminLayout (tự chứa header) */}
+              <Route path="/admin/dashboard" element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminLayout>
+                    <AdminDashboard />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/products" element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminLayout>
+                    <ProductManagement />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/users" element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminLayout>
+                    <UserManagement />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/chat" element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'EMPLOYEE']}>
+                  <AdminLayout>
+                    <AdminChatDashboard />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Employee routes với AdminLayout (tự chứa header) */}
+              <Route path="/employee/orders" element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'EMPLOYEE']}>
+                  <AdminLayout>
+                    <OrderManagement />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } />
+              <Route path="/employee/chat" element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'EMPLOYEE']}>
+                  <AdminLayout>
+                    <AdminChatDashboard />
+                  </AdminLayout>
+                </ProtectedRoute>
+              } />
+              
+              {/* Redirect based on role after login */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <RedirectBasedOnRole />
+                </ProtectedRoute>
+              } />
+            </Routes>
           </Router>
         </CartProvider>
       </WebSocketProvider>

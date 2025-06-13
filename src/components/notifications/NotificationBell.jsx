@@ -92,7 +92,7 @@ const NotificationBell = () => {
     
     setShowDropdown(false);
     
-    // Navigate based on notification type
+    // Navigate based on notification type and extract roomId if available
     switch (notification.type) {
       case 'ORDER_CREATED':
       case 'ORDER_STATUS_UPDATED':
@@ -103,8 +103,22 @@ const NotificationBell = () => {
         navigate('/orders');
         break;
       case 'NEW_MESSAGE':
-        // Could navigate to chat or support page
-        navigate('/');
+        // Extract roomId from notification data if available
+        const roomId = notification.data?.roomId || notification.extraData?.roomId;
+        if (roomId) {
+          navigate(`/messages?tab=my-chats&room=${roomId}`);
+        } else {
+          navigate('/messages?tab=my-chats');
+        }
+        break;
+      case 'CHAT_ASSIGNED':
+        // For staff notifications about new chat assignments
+        const assignedRoomId = notification.data?.roomId || notification.extraData?.roomId;
+        if (assignedRoomId) {
+          navigate(`/messages?tab=my-chats&room=${assignedRoomId}`);
+        } else {
+          navigate('/messages?tab=unassigned');
+        }
         break;
       case 'WELCOME':
         navigate('/');
@@ -137,6 +151,7 @@ const NotificationBell = () => {
       case 'PAYMENT_FAILED':
         return <AlertTriangle {...iconProps} className="h-5 w-5 text-red-500" />;
       case 'NEW_MESSAGE':
+      case 'CHAT_ASSIGNED':
         return <MessageCircle {...iconProps} className="h-5 w-5 text-purple-500" />;
       case 'WELCOME':
         return <Gift {...iconProps} className="h-5 w-5 text-pink-500" />;
@@ -157,6 +172,7 @@ const NotificationBell = () => {
       case 'PAYMENT_FAILED':
         return 'bg-red-50 border-l-4 border-red-500';
       case 'NEW_MESSAGE':
+      case 'CHAT_ASSIGNED':
         return 'bg-purple-50 border-l-4 border-purple-500';
       case 'WELCOME':
         return 'bg-pink-50 border-l-4 border-pink-500';

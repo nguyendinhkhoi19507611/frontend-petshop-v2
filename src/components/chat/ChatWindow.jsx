@@ -11,7 +11,7 @@ import { useWebSocket } from '../../contexts/WebSocketContext';
 import { useAuth } from '../../contexts/AuthContext';
 import chatService from '../../services/chatService';
 
-const ChatWindow = ({ roomId, onClose, minimized, onToggleMinimize }) => {
+const ChatWindow = ({ roomId, onClose, minimized, onToggleMinimize, fullHeight = false }) => {
   const { user } = useAuth();
   const {
     connected,
@@ -20,11 +20,11 @@ const ChatWindow = ({ roomId, onClose, minimized, onToggleMinimize }) => {
     leaveRoom,
     sendTypingIndicator,
     getRoomTypingUsers,
-    messages: contextMessages  // <-- Lấy messages toàn bộ từ context 
+    messages: contextMessages
   } = useWebSocket();
 
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]); // local state
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
 
@@ -154,9 +154,28 @@ const ChatWindow = ({ roomId, onClose, minimized, onToggleMinimize }) => {
 
   const typingUsers = getRoomTypingUsers(roomId);
 
+  // Conditional styling based on fullHeight prop
+  const containerClass = fullHeight 
+    ? "h-full bg-white flex flex-col"
+    : minimized 
+      ? "fixed bottom-4 right-4 z-50"
+      : "fixed bottom-4 right-4 w-80 h-96 bg-white rounded-lg shadow-xl border z-50 flex flex-col";
+
+  const messagesContainerClass = fullHeight
+    ? "flex-1 overflow-y-auto p-6 space-y-4 min-h-0"
+    : "flex-1 overflow-y-auto p-4 space-y-3";
+
+  const headerClass = fullHeight
+    ? "flex-shrink-0 bg-primary-600 text-white p-4 flex items-center justify-between border-b"
+    : "bg-primary-600 text-white p-4 rounded-t-lg flex items-center justify-between";
+
+  const inputContainerClass = fullHeight
+    ? "flex-shrink-0 p-4 border-t bg-white"
+    : "p-4 border-t";
+
   if (minimized) {
     return (
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className={containerClass}>
         <button
           onClick={onToggleMinimize}
           className="bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition"
@@ -173,12 +192,14 @@ const ChatWindow = ({ roomId, onClose, minimized, onToggleMinimize }) => {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 h-96 bg-white rounded-lg shadow-xl border z-50 flex flex-col">
+    <div className={containerClass}>
       {/* Header */}
-      <div className="bg-primary-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+      <div className={headerClass}>
         <div className="flex items-center gap-2">
           <MessageCircle className="h-5 w-5" />
-          <span className="font-medium">Hỗ trợ khách hàng</span>
+          <span className="font-medium">
+            {fullHeight ? 'Cuộc trò chuyện' : 'Hỗ trợ khách hàng'}
+          </span>
           {!connected && (
             <span className="text-xs bg-red-500 px-2 py-1 rounded">
               Đang kết nối...
@@ -186,12 +207,14 @@ const ChatWindow = ({ roomId, onClose, minimized, onToggleMinimize }) => {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={onToggleMinimize}
-            className="text-white hover:text-gray-200 transition"
-          >
-            <Minimize2 className="h-4 w-4" />
-          </button>
+          {!fullHeight && (
+            <button
+              onClick={onToggleMinimize}
+              className="text-white hover:text-gray-200 transition"
+            >
+              <Minimize2 className="h-4 w-4" />
+            </button>
+          )}
           <button
             onClick={onClose}
             className="text-white hover:text-gray-200 transition"
@@ -202,7 +225,7 @@ const ChatWindow = ({ roomId, onClose, minimized, onToggleMinimize }) => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className={messagesContainerClass}>
         {loading ? (
           <div className="text-center text-gray-500">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto"></div>
@@ -264,21 +287,21 @@ const ChatWindow = ({ roomId, onClose, minimized, onToggleMinimize }) => {
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t">
+      <div className={inputContainerClass}>
         <div className="flex gap-2">
           <textarea
             value={message}
             onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             placeholder="Nhập tin nhắn..."
-            className="flex-1 resize-none border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="flex-1 resize-none border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 max-h-20"
             rows="1"
             disabled={!connected}
           />
           <button
             onClick={handleSendMessage}
             disabled={!message.trim() || !connected}
-            className="bg-primary-600 text-white p-2 rounded-md hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-primary-600 text-white p-2 rounded-md hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
           >
             <Send className="h-4 w-4" />
           </button>
