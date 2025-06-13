@@ -1,6 +1,7 @@
+// src/components/layout/Header.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Menu, X, LogOut, Package, LayoutDashboard, UserCircle, MessageCircle } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogOut, Package, LayoutDashboard, UserCircle, MessageCircle, Search, Heart, Gift } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import NotificationBell from '../notifications/NotificationBell';
@@ -8,6 +9,7 @@ import NotificationBell from '../notifications/NotificationBell';
 const Header = ({ onMenuClick, showMenuButton = false }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Safe destructuring with default values
   const { user, logout, isAdmin, isEmployee } = useAuth() || {};
@@ -25,6 +27,14 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
   const closeMenus = () => {
     setIsMenuOpen(false);
     setIsUserMenuOpen(false);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/?search=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm('');
+    }
   };
 
   // Safe function to get cart count
@@ -55,7 +65,7 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
   };
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
+    <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Left side - Menu button (for admin) + Logo */}
@@ -63,29 +73,66 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
             {showMenuButton && (
               <button
                 onClick={onMenuClick}
-                className="p-2 rounded-md text-gray-600 hover:text-primary-600 hover:bg-gray-100 lg:hidden mr-2"
+                className="p-2 rounded-lg text-gray-600 hover:text-primary-600 hover:bg-primary-50 lg:hidden mr-3 transition-all duration-200"
               >
                 <Menu className="h-6 w-6" />
               </button>
             )}
             
-            <Link to="/" className="flex items-center space-x-2" onClick={closeMenus}>
-              <Package className="h-8 w-8 text-primary-600" />
-              <span className="text-xl font-bold text-gray-800">Pet Food Store</span>
+            <Link to="/" className="flex items-center space-x-3 group" onClick={closeMenus}>
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
+                <Package className="h-6 w-6 text-white" />
+              </div>
+              <div className="hidden sm:block">
+                <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent">
+                  Pet Food Store
+                </span>
+                <div className="text-xs text-gray-500 font-medium">Thực phẩm thú cưng</div>
+              </div>
             </Link>
           </div>
+
+          {/* Center - Search (only show for customer layout) */}
+          {!showMenuButton && (
+            <div className="hidden md:flex flex-1 max-w-lg mx-8">
+              <form onSubmit={handleSearch} className="w-full relative group">
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm sản phẩm..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 transition-all duration-300"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-600 text-white px-3 py-1 rounded-lg hover:bg-primary-700 transition-colors duration-200 text-sm font-medium"
+                >
+                  Tìm
+                </button>
+              </form>
+            </div>
+          )}
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {!showMenuButton && ( // Only show for customer layout
               <>
-                <Link to="/" className="text-gray-600 hover:text-primary-600 transition">
+                <Link 
+                  to="/" 
+                  className="text-gray-600 hover:text-primary-600 transition-all duration-200 font-medium relative group"
+                >
                   Trang chủ
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
                 </Link>
                 
                 {user && (
-                  <Link to="/orders" className="text-gray-600 hover:text-primary-600 transition">
-                    Đơn hàng của tôi
+                  <Link 
+                    to="/orders" 
+                    className="text-gray-600 hover:text-primary-600 transition-all duration-200 font-medium relative group"
+                  >
+                    Đơn hàng
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
                   </Link>
                 )}
               </>
@@ -96,43 +143,70 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
               <>
                 {isAdmin && (
                   <>
-                    <Link to="/admin/dashboard" className="text-gray-600 hover:text-primary-600 transition flex items-center gap-1">
+                    <Link 
+                      to="/admin/dashboard" 
+                      className="text-gray-600 hover:text-primary-600 transition-all duration-200 flex items-center gap-2 font-medium"
+                    >
                       <LayoutDashboard className="h-4 w-4" />
                       Dashboard
                     </Link>
-                    <Link to="/admin/products" className="text-gray-600 hover:text-primary-600 transition">
+                    <Link 
+                      to="/admin/products" 
+                      className="text-gray-600 hover:text-primary-600 transition-all duration-200 font-medium"
+                    >
                       Sản phẩm
                     </Link>
-                    <Link to="/admin/users" className="text-gray-600 hover:text-primary-600 transition">
+                    <Link 
+                      to="/admin/users" 
+                      className="text-gray-600 hover:text-primary-600 transition-all duration-200 font-medium"
+                    >
                       Người dùng
                     </Link>
                   </>
                 )}
-                <Link to="/employee/orders" className="text-gray-600 hover:text-primary-600 transition">
+                <Link 
+                  to="/employee/orders" 
+                  className="text-gray-600 hover:text-primary-600 transition-all duration-200 font-medium"
+                >
                   Đơn hàng
                 </Link>
-                <Link to="/employee/chat" className="text-gray-600 hover:text-primary-600 transition flex items-center gap-1">
+                <Link 
+                  to="/employee/chat" 
+                  className="text-gray-600 hover:text-primary-600 transition-all duration-200 flex items-center gap-2 font-medium"
+                >
                   <MessageCircle className="h-4 w-4" />
-                  Chat hỗ trợ
+                  Chat
                 </Link>
               </>
             )}
           </nav>
 
           {/* Right side buttons */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             {/* Notifications - show for all authenticated users */}
             {user && <NotificationBell />}
 
+            {/* Wishlist button - only show for customers */}
+            {!showMenuButton && user && (
+              <button className="relative p-2 text-gray-600 hover:text-red-500 transition-colors duration-200 rounded-lg hover:bg-red-50">
+                <Heart className="h-6 w-6" />
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  0
+                </span>
+              </button>
+            )}
+
             {/* Cart button - only show for customers */}
             {!showMenuButton && (
-              <Link to="/cart" className="relative" onClick={closeMenus}>
-                <ShoppingCart className="h-6 w-6 text-gray-600 hover:text-primary-600 transition" />
-                {getCartCount() > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {getCartCount()}
-                  </span>
-                )}
+              <Link to="/cart" className="relative group" onClick={closeMenus}>
+                <div className="p-2 text-gray-600 hover:text-primary-600 transition-all duration-200 rounded-lg hover:bg-primary-50">
+                  <ShoppingCart className="h-6 w-6" />
+                  {getCartCount() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
+                      {getCartCount()}
+                    </span>
+                  )}
+                </div>
               </Link>
             )}
 
@@ -140,25 +214,35 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
             {user ? (
               <div className="relative">
                 <button
-                  className="flex items-center space-x-2 text-gray-600 hover:text-primary-600 transition"
+                  className="flex items-center space-x-2 p-2 text-gray-600 hover:text-primary-600 transition-all duration-200 rounded-lg hover:bg-primary-50"
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 >
-                  <User className="h-6 w-6" />
-                  <span className="hidden md:block">
+                  <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center shadow-md">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="hidden md:block font-medium">
                     {user.fullName || user.username || 'User'}
                   </span>
                 </button>
 
                 {/* Dropdown menu */}
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border">
-                    <div className="px-4 py-2 text-sm text-gray-700 border-b">
-                      <p className="font-semibold">
-                        {user.fullName || user.username || 'User'}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {getUserRole()}
-                      </p>
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-10 border border-gray-100">
+                    {/* User Info */}
+                    <div className="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-primary-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center shadow-md">
+                          <User className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800">
+                            {user.fullName || user.username || 'User'}
+                          </p>
+                          <p className="text-xs text-primary-600 font-medium">
+                            {getUserRole()}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                     
                     {!showMenuButton && ( // Customer menu items
@@ -166,20 +250,20 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
                         <Link
                           to="/profile"
                           onClick={closeMenus}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                         >
-                          <UserCircle className="h-4 w-4 mr-2" />
+                          <UserCircle className="h-4 w-4 mr-3 text-gray-500" />
                           Hồ sơ cá nhân
                         </Link>
                         <Link
                           to="/orders"
                           onClick={closeMenus}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                         >
-                          <ShoppingCart className="h-4 w-4 mr-2" />
+                          <ShoppingCart className="h-4 w-4 mr-3 text-gray-500" />
                           Đơn hàng của tôi
                         </Link>
-                        <div className="border-t"></div>
+                        <div className="border-t border-gray-100 my-1"></div>
                       </>
                     )}
                     
@@ -188,28 +272,28 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
                         <Link
                           to="/"
                           onClick={closeMenus}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                         >
-                          <Package className="h-4 w-4 mr-2" />
+                          <Package className="h-4 w-4 mr-3 text-gray-500" />
                           Xem cửa hàng
                         </Link>
                         <Link
                           to="/admin/chat"
                           onClick={closeMenus}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                         >
-                          <MessageCircle className="h-4 w-4 mr-2" />
+                          <MessageCircle className="h-4 w-4 mr-3 text-gray-500" />
                           Quản lý Chat
                         </Link>
-                        <div className="border-t"></div>
+                        <div className="border-t border-gray-100 my-1"></div>
                       </>
                     )}
                     
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                      className="w-full flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
                     >
-                      <LogOut className="h-4 w-4 mr-2" />
+                      <LogOut className="h-4 w-4 mr-3" />
                       Đăng xuất
                     </button>
                   </div>
@@ -219,14 +303,14 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
               <div className="flex items-center space-x-2">
                 <Link
                   to="/login"
-                  className="text-gray-600 hover:text-primary-600 transition"
+                  className="text-gray-600 hover:text-primary-600 transition-colors duration-200 font-medium px-4 py-2 rounded-lg hover:bg-primary-50"
                   onClick={closeMenus}
                 >
                   Đăng nhập
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition"
+                  className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-2 rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg transform hover:scale-105"
                   onClick={closeMenus}
                 >
                   Đăng ký
@@ -236,7 +320,7 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden"
+              className="md:hidden p-2 rounded-lg text-gray-600 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -246,24 +330,46 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t">
+          <div className="md:hidden py-4 border-t border-gray-100 bg-white">
+            {/* Mobile Search */}
+            {!showMenuButton && (
+              <div className="mb-4">
+                <form onSubmit={handleSearch} className="relative">
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm sản phẩm..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-20 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary-500"
+                  />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <button
+                    type="submit"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium"
+                  >
+                    Tìm
+                  </button>
+                </form>
+              </div>
+            )}
+
             {!showMenuButton && (
               // Customer mobile menu
               <>
                 <Link
                   to="/"
-                  className="block py-2 text-gray-600 hover:text-primary-600"
+                  className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
                   onClick={closeMenus}
                 >
-                  Trang chủ
+                  🏠 Trang chủ
                 </Link>
                 {user && (
                   <Link
                     to="/orders"
-                    className="block py-2 text-gray-600 hover:text-primary-600"
+                    className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
                     onClick={closeMenus}
                   >
-                    Đơn hàng của tôi
+                    📦 Đơn hàng của tôi
                   </Link>
                 )}
               </>
@@ -276,40 +382,40 @@ const Header = ({ onMenuClick, showMenuButton = false }) => {
                   <>
                     <Link
                       to="/admin/dashboard"
-                      className="block py-2 text-gray-600 hover:text-primary-600"
+                      className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
                       onClick={closeMenus}
                     >
-                      Dashboard
+                      📊 Dashboard
                     </Link>
                     <Link
                       to="/admin/products"
-                      className="block py-2 text-gray-600 hover:text-primary-600"
+                      className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
                       onClick={closeMenus}
                     >
-                      Sản phẩm
+                      📦 Sản phẩm
                     </Link>
                     <Link
                       to="/admin/users"
-                      className="block py-2 text-gray-600 hover:text-primary-600"
+                      className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
                       onClick={closeMenus}
                     >
-                      Người dùng
+                      👥 Người dùng
                     </Link>
                   </>
                 )}
                 <Link
                   to="/employee/orders"
-                  className="block py-2 text-gray-600 hover:text-primary-600"
+                  className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
                   onClick={closeMenus}
                 >
-                  Đơn hàng
+                  📋 Đơn hàng
                 </Link>
                 <Link
                   to="/employee/chat"
-                  className="block py-2 text-gray-600 hover:text-primary-600"
+                  className="block py-3 text-gray-600 hover:text-primary-600 font-medium transition-colors duration-200"
                   onClick={closeMenus}
                 >
-                  Chat hỗ trợ
+                  💬 Chat hỗ trợ
                 </Link>
               </>
             )}
